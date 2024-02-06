@@ -1,19 +1,47 @@
-# Diagnostic Reasoning with Medical Images
+<!-- # Diagnostic Reasoning with Medical Images -->
+# Reasoning over an Image with LMMs
 
-This post is a preliminary study on issues related to the use of a multimodal LLM (Large Language Model), such as OpenAI's GPT-4V, for making medical diagnosis based on a medical image (such as X-ray, CT scan, MRI scan, ultrasound scan, etc.). Doing so would involve the following topics:
+*DRAFT*
 
-- **Which LLM** is suitable for such a purpose. For now we will focus only on OpenAI's GPT-4V model, since in another study we have seen [good result when applying it to autonomous driving](https://github.com/kaihuchen/AutonomousBackseatDriver/blob/main/README.md).
-- **Sufficient knowledge in the LLM**, i.e., whether the LLM in question has been trained to contain sufficient knowledge for the task. For this we will choose to defer for now.
-- **Diagnostic Reasoning**: making correct diagnosis is often not an one-shot activity, but rather may need to ask the right questions and take many steps. In other words, it is really a process of performing diagnostic reasoning. The main goal of this study is to find whether GPT-4V has sufficient capacity to perform diagnostic reasoning. 
+An **expert chatbot** that utilizes a Large Multimodal Model (LMM), should have problem-solving skills to handle complex scenarios. This is because such an LMM may have sufficient general and domain-specific knowledge, but it may lack the problem-solving skills required for carrying a complex task.
 
-# Basic test setup:
-- Our test is performed using Custom GPT created in OpenAI's GPTs Store
-- GPT-4 (which implicitly includes GPT-4V) is selected as its working model. 
+This article is a preliminary study on issues related to the use of a LMM, such as OpenAI's GPT-4V, as a smart chatbot assistant in problem that require problem-solving skills.
+
+In this article we will use examples from the following distinct real-world problem domains to demonstrate problem and solutions.
+- The vision component of a smart **medical assistant**, offering medical diagnosis based on a medical image (such as X-ray, CT scan, MRI scan, ultrasound scan, etc.), and request additional information needed for reaching a diagnosis if necessary.
+- The vision component of a **Level 5 autonomous driving** system, responsible for making high-level assessment of the overall situation, and make commonsense suggestions with explanation. 
+- The vision component of a **guardian robot** (i.e., a GuardianBot) that goes around the house and is responsible for spotting any hazard or threat, and notifies the appropriate authority when necessary.
+
+## Basic test setup:
+- Convention:
+    - In this article, we use the term *chatbot* to refer to the working agent consist of LMM, some level of prompt engineering, knowledge files, and RAG (Retrieval Augmented Generation) layer (if any).
+- Most experiments with the test cases are performed using a Custom GPT created in OpenAI's GPTs Store. Some are performed using [Google Bard/Gemini](http://bard.google.com).
+- GPT-4 (which implicitly includes GPT-4V) is selected as the working model. 
+- Each test case is desgined to evaluate an LMM's capability in suggesting appropriate actions on the situation depicted in a given image. 
+- Many test cases are edge cases that require nuanced understanding of the domain in order for the LMM to make the right decision.
+- **Some test cases are designed to require some level of problem-solving skills to reach the right decision. This is the focus of this article.**
+
+<!--
 - The following X-ray image is used for testing, which 
 ![](images/X-Ray%20Squarepants%20toy%20in%20chest.jpg)
 - The main thing that we experiment with is the prompt in the **Insructions** of the the Custom GPT's configuration.
+-->
 
-# Test #1: simple prompting
+## Diagnostic Reasoning
+
+An LMM can generate a reasonable response for a given test case, but it may not have the ability to follow up with the appropriate questions to reach a high-quality final answer in multiple steps.
+
+For instance, suppose we have a GPT-4V chatbot that acts as a medical assistant, and we show it the following image for diagnosis:
+
+![x-ray swallowed toy](images/X-Ray%20Squarepants%20toy%20in%20chest.jpg)
+
+in this case GPT-4V's response is that it is a case of *anterior cervical discectomy and fusion (ACDF) with a plate and screw construct*, which is not urgent. 
+
+However, this is incorrect because the actual problem is that the patient has ingested a toy, which is urgent. The issue here is that GPT-4V picks one plausible response from many and sticks with it, even if it is wrong, while the medical profession requires asking the right questions to verify or rule out each possible diagnosis, until we narrow down to one or a few.
+
+<!--
+
+## Test #1: simple prompting
 The following simple prompt is used for this test
 
 > Give detailed description of this image for areas of concern only, analyze it like a medical radiologist. Keep answers as concise as possible without warning messages.
@@ -28,9 +56,68 @@ Response from GPT-4V:
 
 Assessment:
 
-- GPT-4V zoom in on an incorrect, and failed to explore other possibilities
-- GPT-4V classifies the problem as non-urgent diagnosis which is adequate
+- GPT-4V zoom in on an incorrect diagnosis, and failed to explore other possibilities.
+- GPT-4V incorrectly classifies the problem as non-urgent which is dangerous.
 
+## Test #2: more elaborate prompting
 
+The following simple prompt is used for this test:
+
+## Test #3: Tree-of-Thoughts prompting
+-->
+One way to get this chatbot to pursue a line of question-and-diagnosis is to use the **Tree-of-Thoughts prompting** technique.
+
+*TO BE FILLED*
+
+## Other problem-solving techniques
+There are several other prompting techniques that are similar to the tree-of-thoughts technique, such as:
+
+- Tree-of-thoughts (ToT) prompting: this technique allows Large Language Models (LLMs) to explore multiple reasoning paths when solving complex problems1. It involves following a tree structure of reasoning steps, where each node is a state representing a partial solution with the input and the sequence of thoughts so far1. The model can evaluate and select the most promising states to continue the search until it reaches the final answer.
+
+    ToT prompting can help LLMs improve their logical problem-solving, reasoning, and strategic thinking skills1. It can also help them overcome the limitations of linear and left-to-right thinking that are inherent in autoregressive models1. ToT prompting has been applied to various tasks, such as mathematics, creative writing, and crossword puzzles.
+- Chain-of-thought (CoT) prompting: This technique prompts the model to generate a sequence of intermediate thoughts that lead to the final answer, using a special token (such as ;) to separate each thought. CoT helps the model break down complex problems into smaller steps and improve its reasoning skills. However, CoT is limited by its linear structure and may not explore diverse or alternative solutions.
+- Self-consistency Generated Knowledge (SKG) prompting: This technique prompts the model to generate additional knowledge or facts that are consistent with the given input and context, using a special token (such as :) to indicate the generated knowledge. SKG helps the model enrich its understanding of the problem and provide more evidence or explanation for its answer. However, SKG may not be reliable or accurate, as the model may generate false or irrelevant knowledge.
+- Retrieval Augmented Generation (RAG) prompting: This technique prompts the model to retrieve relevant documents or passages from a large corpus of text, such as Wikipedia, and use them as additional context for generating the answer. RAG helps the model leverage external knowledge sources and provide more informative and diverse answers. However, RAG may not be efficient or precise, as the model may retrieve too many or too few documents, or documents that are not relevant to the problem.
+
+## Eliminate contextual bias for correct recognition
+
+Sometimes an LMM may categorize an object incorrectly due to the biases in the visual context or in the prompt. 
+
+For example, when given the following image from the GuardianBot application domain, GPT-4V mistakenly categorizes the cougar on the deck as a dog.
+
+![cougar on deck](images/cougar_on_deck.jpg)
+
+There are several ways to deal with this:
+
+### 1. Crop out the target object as a separate image for identification
+
+*TO BE FILLED*
+
+### 2. Mask out image leaving only the target object for identification
+
+*TO BE FILLED*
+
+### 3. Apply markers on the target objectd and use them in dialog with LMM
+
+*TO BE FILLED*
+
+### 4. Override by knowledge file
+
+*TO BE FILLED*
+
+## Additional Resources
+
+- For the **Level 5 autonomous driving** application:
+    - [List of LMM test cases](https://github.com/kaihuchen/AutonomousBackseatDriver/blob/main/README.md). This is work in progress.
+    - Live demo: [Autonomous Backseat Driver](https://chat.openai.com/g/g-e4IV3KhGm-autonomous-backseat-driver). \
+    Note: this is a Custom GPT, and OpenAI requires that user must have ChatGPT Plus account in order to access.
+- For the **GuardianBot** application:
+    - [List of LMM test cases](https://github.com/kaihuchen/GuardianBot). This is work in progress.
+    - Live demo: [GuardianBot Custom GPT](https://chat.openai.com/g/g-WSwts3Yzj-guardianbot). \
+    Note: this is a Custom GPT, and OpenAI requires that user must have ChatGPT Plus account in order to access.
+- For the **Radiologist Assistant** application:
+    - List of LMM test cases: *NOT PUBLISHED YET*.
+    - Live demo: [Radiologist Assistant with Tree-of-Thoughts reasoning](https://chat.openai.com/g/g-fyKhCyjFS-radiologist-v2). 
+    Note: this is a Custom GPT, and OpenAI requires that user must have ChatGPT Plus account in order to access.
 
 
