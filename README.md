@@ -3,7 +3,7 @@
 
 *DRAFT*
 
-An **expert chatbot** that utilizes a Large Multimodal Model (LMM), should have problem-solving skills to handle complex scenarios. This is because such an LMM may have sufficient general and domain-specific knowledge, but it may lack the problem-solving skills required for carrying a complex task.
+An **expert chatbot** that utilizes a Large Multimodal Model (LMM) need to have problem-solving skills to handle complex scenarios. This is because such an LMM may have sufficient general and domain-specific knowledge, but it may lack the problem-solving skills required for carrying a complex task.
 
 This article is a preliminary study on issues related to the use of a LMM, such as OpenAI's GPT-4V, as a smart chatbot assistant in problem that require problem-solving skills.
 
